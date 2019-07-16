@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>michat</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <script type="text/javascript" th:src="@{static/js/sdk/mimc-min_1_0_2.js}"></script>
+    <!--<script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
+    <link href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" rel="stylesheet">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/umd/locale/zh-CN.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/umd/locale/en.js"></script>-->
+    <script th:src="@{/webjars/vue/2.6.9/dist/vue.min.js}"></script>
+    <script th:src="@{/webjars/axios/0.19.0-beta.1/dist/axios.min.js}"></script>
+    <link th:href="@{/webjars/element-ui/2.10.1/lib/theme-chalk/index.css}" rel="stylesheet">
+    <script th:src="@{/webjars/element-ui/2.10.1/lib/index.js}"></script>
+    <script th:src="@{/webjars/element-ui/2.10.1/lib/umd/locale/zh-CN.js}"></script>
+    <script th:src="@{/webjars/element-ui/2.10.1/lib/umd/locale/en.js}"></script>
+    <script th:src="@{static/js/js.cookie.min.js}"></script>
+    <link th:href="@{static/css/demo.css}" rel="stylesheet">
+    <link th:href="@{static/css/message.css}" rel="stylesheet">
+    <script th:src="@{static/js/chatIndex.js}"></script>
+    <style>
+        #sendButton {
+            position:absolute;
+            right: 20px;
+            bottom: 16px;
+        }
+
+        .mod {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .el-menu-item.is-active {
+            background-color: #43474C !important;
+        }
+    </style>
+</head>
+
+<div id="app">
+    <el-container ref="app">
+        <el-container style="height: 100%;">
+            <el-aside width='200px' style="height:100%;background-color: #2e3238;">
+                <el-container>
+                    <el-header style="height: 100px;background-color: #2e3238;padding: 10px; border-bottom:1px solid #24272C;">
+                        <!--<div id="login">
+                            &lt;!&ndash;<label>login user：</label>&ndash;&gt;
+                            <input id="loginUser" type="text" readonly="readonly" />
+                            &lt;!&ndash;<button id="button2" onclick="login()">登录</button>&ndash;&gt;
+                            <button id="button3" onclick="logout()">退出登录</button>
+                            <input id="username" type="text" style="visibility: hidden" />
+                        </div>-->
+                        <el-image
+                                style="width: 30px; height: 30px"
+                                :src="profilePic"
+                                fit="fill"></el-image>
+                        <input id="loginUser" type="text" readonly="readonly" style="color: white; background-color: rgb(46, 50, 56);border: 0;position: absolute;left: 40px;top: 10px;width: 100px;" />
+
+                        <el-input
+                                placeholder="请输入内容"
+                                prefix-icon="el-icon-search"
+                                v-model="searchFriend" size="mini">
+                        </el-input>
+                    </el-header>
+                    <el-main style="padding: 0;" ref="homePage">
+                        <el-menu background-color="#2e3238"
+                                 text-color="#FFFFFF"
+                                 active-text-color="#FFFFFF">
+                            <template v-for="(item, index) of friendData">
+                                <el-menu-item :index="index" @click="chat(item.name)">
+                                    <template slot="title">
+                                        <span slot="title">{{item.name}}</span>
+                                    </template>
+                                </el-menu-item>
+                            </template>
+                        </el-menu>
+                    </el-main>
+                </el-container>
+            </el-aside>
+            <el-main style="height:100%;padding:1px;">
+                <el-container ref="app">
+                    <el-main ref="message">
+                        <div id="message" class="message">
+                            <ul id="tab-group">
+
+                            </ul>
+                        </div>
+                    </el-main>
+                    <el-footer style="line-height: 0;">
+                        <div id="input" style="height: 120px;">
+                            <!--<label>消息：</label>-->
+                            <!--<input id="sendmessage" type="text" />-->
+                            <!--<el-input
+                                    type="textarea"
+                                    :rows="5"
+                                    placeholder="按Enter发送内容"
+                                    v-model="textarea" @keyup.enter.native="sendMsg()" style="width: 100%;height: 100%">
+                            </el-input>-->
+                            <textarea id="textarea" v-model="textarea" rows="5" placeholder="按Enter发送内容" style="width: 100%;height: 100%; border: 0;"></textarea>
+                            <div id="sendButton">
+                                <!--<button id="button1" onclick="sendMsg()">发送</button>-->
+                                <el-popover
+                                        placement="top"
+                                        title=""
+                                        width="200"
+                                        trigger="manual"
+                                        content="不能发送空白消息"
+                                        v-model="visible">
+                                    <el-button size="mini" type="primary" slot="reference" @click="sendMsg()">发送</el-button>
+                                </el-popover>
+                                <!--<button id="buttonpush" onclick="pushMsg()">推送</button>-->
+                            </div>
+                        </div>
+                    </el-footer>
+                </el-container>
+            </el-main>
+        </el-container>
+    </el-container>
+</div>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            textarea: '',
+            visible: false,
+            activeName: 'second',
+            clientHeight: '',
+            profilePic: '/static/img/simon.jpg',
+            loginUser: '',
+            searchFriend: '',
+            friendData: [
+                {
+                    name: "simon",
+                    profilePic: "/static/img/simon.jpg"
+                },
+                {
+                    name: 'jack'
+                },
+                {
+                    name: 'rose'
+                },
+                {
+                    name: 'ddd'
+                },
+                {
+                    name: 'tony'
+                },
+                {
+                    name: 'aj'
+                },
+                {
+                    name: 'adi'
+                },
+                {
+                    name: 'nike'
+                },
+                {
+                    name: 'hxrk'
+                },
+                {
+                    name: 'tebu'
+                },
+                {
+                    name: 'biaoma'
+                }
+            ]
+        },
+        mounted: function () {
+            var mimc_appAccount = Cookies.get("mimc_appAccount");
+            console.log("mimc_appAccount=" + mimc_appAccount);
+            if (mimc_appAccount && "" !== mimc_appAccount) {
+                console.log(mimc_appAccount + "自动登录");
+                this.loginUser = mimc_appAccount;
+                login();
+            }
+
+            // 初始化对话框
+            let tabGroup = document.getElementById("tab-group");
+            for(let i = 0, len = this.friendData.length; i < len; i++) {
+                let tab = document.createElement("li");
+                tab.id = "user-" + this.friendData[i].name;
+                if (0 === i) {
+                    tab.className = "mod active";
+                } else {
+                    tab.className = "mod";
+                }
+                /*let p = document.createElement("p");
+                p.innerHTML = this.friendData[i].name;
+                tab.appendChild(p);*/
+                tabGroup.appendChild(tab);
+            }
+
+            Cookies.set("toUser", this.friendData[0].name);
+
+
+            // 获取浏览器可视区域高度
+            this.clientHeight =   `${document.documentElement.clientHeight}`;
+            //document.body.clientWidth;
+            //console.log(self.clientHeight);
+            window.onresize = function temp() {
+                this.clientHeight = `${document.documentElement.clientHeight}`;
+            };
+        },
+        watch: {
+            // 如果 `clientHeight` 发生改变，这个函数就会运行
+            clientHeight: function () {
+                this.changeFixed(this.clientHeight)
+            }
+        },
+        methods: {
+            sendMsg: function () {
+                var toUser = Cookies.get("toUser");
+                if (!toUser) {
+                    this.$message.error('请输入对方账号');
+                } else {
+                    if ("" === this.textarea) {
+                        this.visible = true;
+                        setTimeout(function () {
+                            app.visible = false;
+                        }, 2000);
+                    } else {
+                        let mimc_appAccount = Cookies.get("mimc_appAccount");
+                        if (mimc_appAccount === toUser) {
+                            this.$message.error("不能给自己发送消息");
+                        } else {
+                            this.visible = false;
+                            sendMsg(toUser, this.textarea);
+                            this.textarea = "";
+                        }
+                    }
+                }
+            },
+            handleClick(tab, event) {
+                console.log(tab, event);
+            },
+            chat(friend) {
+                /*var message = document.getElementById("message");
+                var ul = document.createElement("ul");
+                ul.id = friend;
+                message.appendChild(ul);
+                document.getElementById("username").value = friend;*/
+                //document.getElementById("username").value = friend;
+                Cookies.set("toUser", friend);
+                let index = -1;
+                console.log(friend);
+                for(let i = 0, len = this.friendData.length; i < len; i++) {
+                    if (friend === this.friendData[i].name) {
+                        index = i;
+                        break;
+                    }
+                }
+
+                let tabGroup = document.getElementById("tab-group");
+                let tabs = tabGroup.getElementsByClassName("mod");
+                for (let i = 0, len = tabs.length; i < len; i++) {
+                    tabs[i].className = "mod";
+                    if (index === i) {
+                        tabs[i].className = "mod active";
+                    }
+                }
+            },
+            changeFixed(clientHeight){ //动态修改样式
+                // console.log(clientHeight);
+                // console.log(this.$refs.homePage.$el.style.height);
+                this.$refs.homePage.$el.style.height = clientHeight-100+'px';
+                this.$refs.message.$el.style.height = clientHeight-125+'px';
+                this.$refs.app.$el.style.height = clientHeight+'px';
+            },
+        }
+    });
+
+    document.getElementById("textarea").onkeydown=function(e){
+        if(e.keyCode == 13 && e.ctrlKey){
+            document.getElementById("a").value += "\n";
+        }else if(e.keyCode == 13){
+            // 避免回车键换行
+            e.preventDefault();
+            // 下面写你的发送消息的代码
+            app.sendMsg();
+        }
+    }
+</script>
+
+
+</html>
