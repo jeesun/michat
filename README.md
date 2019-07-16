@@ -9,9 +9,13 @@
 # michat
 一个基于小米即时消息云服务(MIMC)的Web IM。
 
+## 截图展示
+![聊天截图](screenshots/chat.png)
+
 ## 如何使用
 直接运行类MichatApplication，启动项目。访问[http://localhost:8081/login](http://localhost:8081/login)，登录账号。默认配置了以下账号做测试：
 ```
+用户名 密码
 user 123456
 admin 123456
 jack 123456
@@ -23,6 +27,3 @@ ddd 123456
 ## 如何配置自己的MIMC
 登录[https://dev.mi.com/console/appservice/mimc.html](https://dev.mi.com/console/appservice/mimc.html)，注册并创建应用，修改
 chatIndex.js的mimc_appId，mimc_appSecret，mimc_appKey为你自己的值。
-
-## 截图展示
-![聊天截图](screenshots/chat.png)
