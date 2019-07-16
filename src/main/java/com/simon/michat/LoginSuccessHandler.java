@@ -1,6 +1,7 @@
 package com.simon.michat;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -17,9 +18,9 @@ import java.io.IOException;
  * @version 1.0
  * @date 2019-07-16 9:29
  */
-@Slf4j
 @Component
 public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+    private static Logger log = LoggerFactory.getLogger(LoginSuccessHandler.class);
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
