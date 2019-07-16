@@ -29,3 +29,6 @@ ddd 123456
 ## 如何配置自己的MIMC
 登录[https://dev.mi.com/console/appservice/mimc.html](https://dev.mi.com/console/appservice/mimc.html)，注册并创建应用，修改
 chatIndex.js的mimc_appId，mimc_appSecret，mimc_appKey为你自己的值。
+
+## 为什么是Spring Boot架构
+偷懒解决登录问题。跟Spring Boot没关系，基本是前端代码。
