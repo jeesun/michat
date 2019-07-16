@@ -14,7 +14,8 @@
 ![聊天截图](screenshots/chat.png)
 
 ## 如何使用
-直接运行类MichatApplication，启动项目。访问[http://localhost:8081/login](http://localhost:8081/login)，登录账号。默认配置了以下账号做测试：
+1. 请先双击目录“需要安装的jars”的install.bat，安装自定义的jars。
+2. 直接运行类MichatApplication，启动项目。访问[http://localhost:8081/login](http://localhost:8081/login)，登录账号。默认配置了以下账号做测试：
 ```
 用户名 密码
 user 123456
