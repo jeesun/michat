@@ -7,7 +7,8 @@
 </p>
 
 # michat
-一个基于小米即时消息云服务(MIMC)的Web IM。
+一个基于小米即时消息云服务(MIMC)的Web IM。  
+源码地址[github](https://github.com/jeesun/michat)和[gitee](https://gitee.com/jeesun/michat)同步。
 
 ## 截图展示
 ![聊天截图](screenshots/chat.png)
