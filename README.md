@@ -1,4 +1,7 @@
 <p align="center">
+    <h1>michat</h1>
+</p>
+<p align="center">
 <a href="http://www.oracle.com/technetwork/java/javase/overview/index.html"><img src="https://img.shields.io/badge/language-java%208.0-orange.svg"></a>
 <a href="https://github.com/vuejs/vue">
     <img src="https://img.shields.io/badge/vue-2.6.9-brightgreen.svg" alt="vue">
@@ -12,7 +15,7 @@
 <img src="https://img.shields.io/badge/release-0.1.0-brightgreen.svg">
 </p>
 
-# michat
+# 简介
 一个基于小米即时消息云服务(MIMC)的Web IM。  
 源码地址[github](https://github.com/jeesun/michat)和[gitee](https://gitee.com/jeesun/michat)同步。
 
