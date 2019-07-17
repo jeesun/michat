@@ -21,6 +21,60 @@
     <script th:src="@{static/js/js.cookie.min.js}"></script>
     <link th:href="@{static/css/demo.css}" rel="stylesheet">
     <link th:href="@{static/css/message.css}" rel="stylesheet">
+    <script>
+        // 给chatIndex.js调用的。
+        loginedUser = {
+            name: "",
+            profilePic: ""
+        };
+
+        friendData = [
+            {
+                name: "simon",
+                profilePic: "/static/img/simon.jpg"
+            },
+            {
+                name: 'jack',
+                profilePic: "/static/img/jack.jpg"
+            },
+            {
+                name: 'rose',
+                profilePic: "/static/img/rose.jpg"
+            },
+            {
+                name: 'ddd',
+                profilePic: "/static/img/ddd.jpg"
+            },
+            {
+                name: 'tony',
+                profilePic: "/static/img/tony.jpg"
+            },
+            {
+                name: 'aj',
+                profilePic: "/static/img/aj.jpg"
+            },
+            {
+                name: 'adi',
+                profilePic: "/static/img/adi.jpg"
+            },
+            {
+                name: 'nike',
+                profilePic: "/static/img/nike.jpg"
+            },
+            {
+                name: 'hxrk',
+                profilePic: "/static/img/hxrk.jpg"
+            },
+            {
+                name: 'tebu',
+                profilePic: "/static/img/tebu.jpg"
+            },
+            {
+                name: 'biaoma',
+                profilePic: "/static/img/biaoma.jpg"
+            }
+        ];
+    </script>
     <script th:src="@{static/js/chatIndex.js}"></script>
     <style>
         #sendButton {
@@ -60,7 +114,7 @@
                                 style="width: 30px; height: 30px"
                                 :src="profilePic"
                                 fit="fill"></el-image>
-                        <input id="loginUser" type="text" readonly="readonly" style="color: white; background-color: rgb(46, 50, 56);border: 0;position: absolute;left: 40px;top: 10px;width: 100px;" />
+                        <input id="loginUser" v-model="loginUser.name" type="text" readonly="readonly" style="color: white; background-color: rgb(46, 50, 56);border: 0;position: absolute;left: 40px;top: 10px;width: 100px;" />
 
                         <el-input
                                 placeholder="请输入内容"
@@ -131,53 +185,35 @@
             visible: false,
             activeName: 'second',
             clientHeight: '',
-            profilePic: '/static/img/simon.jpg',
-            loginUser: '',
+            profilePic: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
+            loginUser: {
+                name: '',
+                profilePic: ''
+            },
+            toUser: {
+                name: '',
+                profilePic: ''
+            },
             searchFriend: '',
-            friendData: [
-                {
-                    name: "simon",
-                    profilePic: "/static/img/simon.jpg"
-                },
-                {
-                    name: 'jack'
-                },
-                {
-                    name: 'rose'
-                },
-                {
-                    name: 'ddd'
-                },
-                {
-                    name: 'tony'
-                },
-                {
-                    name: 'aj'
-                },
-                {
-                    name: 'adi'
-                },
-                {
-                    name: 'nike'
-                },
-                {
-                    name: 'hxrk'
-                },
-                {
-                    name: 'tebu'
-                },
-                {
-                    name: 'biaoma'
-                }
-            ]
+            friendData: friendData
         },
         mounted: function () {
             var mimc_appAccount = Cookies.get("mimc_appAccount");
             console.log("mimc_appAccount=" + mimc_appAccount);
             if (mimc_appAccount && "" !== mimc_appAccount) {
                 console.log(mimc_appAccount + "自动登录");
-                this.loginUser = mimc_appAccount;
-                login();
+                this.loginUser.name = mimc_appAccount;
+                for(let i = 0, len = this.friendData.length; i < len; i++) {
+                    if (mimc_appAccount === this.friendData[i].name) {
+                        loginedUser = this.friendData[i];
+                        this.loginUser.name = this.friendData[i].name;
+                        this.loginUser.profilePic = this.friendData[i].profilePic;
+                        this.profilePic = this.friendData[i].profilePic;
+                        break;
+                    }
+                }
+                console.log(this.loginUser.profilePic);
+                login(mimc_appAccount);
             }
 
             // 初始化对话框
@@ -215,9 +251,9 @@
         },
         methods: {
             sendMsg: function () {
-                var toUser = Cookies.get("toUser");
-                if (!toUser) {
-                    this.$message.error('请输入对方账号');
+                //var toUser = Cookies.get("toUser");
+                if (!this.toUser.name || "" === this.toUser.name) {
+                    this.$message.error('请选择对方账号');
                 } else {
                     if ("" === this.textarea) {
                         this.visible = true;
@@ -225,12 +261,12 @@
                             app.visible = false;
                         }, 2000);
                     } else {
-                        let mimc_appAccount = Cookies.get("mimc_appAccount");
-                        if (mimc_appAccount === toUser) {
+                        //let mimc_appAccount = Cookies.get("mimc_appAccount");
+                        if (this.loginUser.name === this.toUser.name) {
                             this.$message.error("不能给自己发送消息");
                         } else {
                             this.visible = false;
-                            sendMsg(toUser, this.textarea);
+                            sendMsg(this.toUser, this.textarea);
                             this.textarea = "";
                         }
                     }
@@ -246,12 +282,14 @@
                 message.appendChild(ul);
                 document.getElementById("username").value = friend;*/
                 //document.getElementById("username").value = friend;
-                Cookies.set("toUser", friend);
+                //Cookies.set("toUser", friend);
                 let index = -1;
                 console.log(friend);
                 for(let i = 0, len = this.friendData.length; i < len; i++) {
                     if (friend === this.friendData[i].name) {
                         index = i;
+                        this.toUser.name = this.friendData[i].name;
+                        this.toUser.profilePic = this.friendData[i].profilePic;
                         break;
                     }
                 }

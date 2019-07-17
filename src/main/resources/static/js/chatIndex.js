@@ -56,16 +56,8 @@ function httpRequest(url, data) {
     return JSON.parse(xhr.response);
 }
 
-function login() {
-    mimc_appAccount = document.getElementById("loginUser").value;
-    if (!mimc_appAccount || "" === mimc_appAccount) {
-        mimc_appAccount = Cookies.get("mimc_appAccount");
-        document.getElementById("loginUser").value = mimc_appAccount;
-    }
-    if (!mimc_appAccount || "" === mimc_appAccount) {
-        console.log("cookie未缓存mimc_appAccount，请重新登录");
-        return;
-    }
+function login(username) {
+    mimc_appAccount = username;
     user = new MIMCUser(mimc_appId, mimc_appAccount);
     user.registerP2PMsgHandler(receiveP2PMsg);
     user.registerGroupMsgHandler(receiveP2TMsg);
@@ -244,7 +236,13 @@ function receiveP2PMsg(message) {
     writeTimeToScreens(date, 1, message.getFromAccount(), mimc_appAccount);
     var disMsg = new Base64();
     console.log("biztype=" + message.getBizType());
-    writeToScreens(disMsg.decode(JSON.parse(message.getPayload()).payload), 1, message.getFromAccount(), mimc_appAccount);
+    for(let i = 0, len = friendData.length; i < len; i++) {
+        if (message.getFromAccount() === friendData[i].name) {
+            writeToScreens(disMsg.decode(JSON.parse(message.getPayload()).payload), 1, friendData[i], loginedUser);
+            break;
+        }
+    }
+
 }
 
 function receiveP2TMsg(message) {
@@ -268,12 +266,12 @@ function sendMsg(toUser, message) {
     }));
     console.log(jsonMsg);
     try {
-        var packetId = user.sendMessage(toUser, jsonMsg);
+        var packetId = user.sendMessage(toUser.name, jsonMsg);
     } catch (err) {
         console.log("sendMessage fail, err=" + err);
     }
-    writeTimeToScreens(new Date(), 0, mimc_appAccount, toUser);
-    writeToScreens(message, 0, mimc_appAccount, toUser);
+    writeTimeToScreens(new Date(), 0, loginedUser, toUser);
+    writeToScreens(message, 0, loginedUser, toUser);
 }
 
 function pushMsg() {
@@ -461,7 +459,7 @@ function writeToScreens(message, msgSource, fromUser, toUser) {
     avatar.style.width = "30px";
     avatar.style.height = "30px";
     avatar.className = "avatar";
-    avatar.src = "http://meitu.qqzong.com/www.52520qq.com/uploads/allimg/160321/063T64U8-0.jpg";
+    avatar.src = fromUser.profilePic;
     main.appendChild(avatar);
 
     var text = document.createElement("div");
@@ -473,10 +471,10 @@ function writeToScreens(message, msgSource, fromUser, toUser) {
     var outputs;
     if (0 === msgSource) {
         // 消息来源是自己，说明是自己发送的消息
-        outputs = document.getElementById("user-" + toUser);
+        outputs = document.getElementById("user-" + toUser.name);
     } else {
         // 消息来源是对方，说明是自己接收的消息
-        outputs = document.getElementById("user-" + fromUser);
+        outputs = document.getElementById("user-" + fromUser.name);
     }
     if (outputs) {
         outputs.appendChild(li);
