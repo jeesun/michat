@@ -540,6 +540,9 @@ function writeToScreens(message, msgSource, fromUser, toUser) {
     }
     if (outputs) {
         outputs.appendChild(li);
+        // 保证聊天窗口滚动条在最底部
+        let messageBox = document.getElementById("messageBox");
+        messageBox.scrollTop = messageBox.scrollHeight;
     } else {
         console.error("not found outputs");
     }
