@@ -1,5 +1,5 @@
 <p align="center">
-    <h1>michat</h1>
+    <h1 style="text-align: center;">michat</h1>
 </p>
 <p align="center">
 <a href="http://www.oracle.com/technetwork/java/javase/overview/index.html"><img src="https://img.shields.io/badge/language-java%208.0-orange.svg"></a>
