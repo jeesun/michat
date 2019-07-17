@@ -23,7 +23,9 @@
 
 ## 如何使用
 1. 请先双击目录“需要安装的jars”的install.bat，安装自定义的jars。
-2. 直接运行类MichatApplication，启动项目。访问[http://localhost:8081/login](http://localhost:8081/login)，登录账号。默认配置了以下账号做测试：
+2. 直接运行类MichatApplication，启动项目。访问[http://localhost:8081/login](http://localhost:8081/login)，登录账号。
+如果要模拟两个用户互相发送消息，请使用两个浏览器分别登陆不同的用户。
+默认配置了以下账号做测试：
 ```
 用户名 密码
 user 123456
