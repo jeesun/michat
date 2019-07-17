@@ -398,15 +398,15 @@ function writeTimeToScreens(date, msgSource, fromUser, toUser) {
     let outputs;
     if (0 === msgSource) {
         // 消息来源是自己，说明是自己发送的消息
-        outputs = document.getElementById("user-" + toUser);
+        outputs = document.getElementById("user-" + toUser.name);
     } else {
         // 消息来源是对方，说明是自己接收的消息
-        outputs = document.getElementById("user-" + fromUser);
+        outputs = document.getElementById("user-" + fromUser.name);
     }
     if (outputs) {
 
     } else {
-        console.log("not found outputs");
+        console.error("not found outputs");
     }
 
     // 判断和上一次发送或者接收的时间间隔，如果超过1分钟，才显示时间
