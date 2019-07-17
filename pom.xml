@@ -89,6 +89,12 @@
 			<artifactId>element-ui</artifactId>
 			<version>2.10.1</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.webjars.npm</groupId>
+			<artifactId>dayjs</artifactId>
+			<version>1.8.9</version>
+		</dependency>
 	</dependencies>
 
 	<build>

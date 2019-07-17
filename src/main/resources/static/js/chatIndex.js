@@ -13,22 +13,55 @@ function PrefixInteger(num, length) {
     return (Array(length).join('0') + num).slice(-length);
 }
 
+/**
+ * 返回中文星期几
+ * @param day Day of Week (Sunday as 0, Saturday as 6)
+ */
+function chinaWeek(day) {
+    switch (day) {
+        case 0:
+            day = "星期天";
+            break;
+        case 1:
+            day = "星期一";
+            break;
+        case 2:
+            day = "星期二";
+            break;
+        case 3:
+            day = "星期三";
+            break;
+        case 4:
+            day = "星期四";
+            break;
+        case 5:
+            day = "星期五";
+            break;
+        case 6:
+            day = "星期六";
+            break;
+    }
+    return day;
+}
+
 /*@note: fetchToken()访问APP应用方自行实现的AppProxyService服务，该服务实现以下功能：
     存储appId/appKey/appSec（不应当存储在APP客户端/html/js）
     用户在APP系统内的合法鉴权
     调用小米TokenService服务，并将小米TokenService服务返回结果通过fetchToken()原样返回 **/
 function fetchMIMCToken() {
     if (!mimc_appAccount || "" === mimc_appAccount) {
-        mimc_appAccount = Cookies.get("mimc_appAccount");
+        mimc_appAccount = window.sessionStorage.getItem("mimc_appAccount");
     }
     console.log("当前账号为" + mimc_appAccount);
-    var result = Cookies.get('user');
+    var result = window.sessionStorage.getItem('user');
     console.log(typeof result);
     if (!result || result === "{}" || JSON.stringify(result) === "{}") {
         let sendData = {appId: mimc_appId, appKey: mimc_appKey, appSecret: mimc_appSecret, appAccount: mimc_appAccount};
         result = httpRequest('https://mimc.chat.xiaomi.net/api/account/token', sendData);
-        Cookies.set('user', result);
-        Cookies.set("mimc_appAccount", mimc_appAccount);
+        //Cookies.set('user', result);
+        //Cookies.set("mimc_appAccount", mimc_appAccount);
+        window.sessionStorage.setItem("user", JSON.stringify(result));
+        window.sessionStorage.setItem("mimc_appAccount", mimc_appAccount);
     } else {
         console.log("使用cookie中缓存的账号信息登录");
         if (typeof result === "string") {
@@ -37,8 +70,10 @@ function fetchMIMCToken() {
             if (mimc_appAccount !== result.data.appAccount) {
                 let sendData = {appId: mimc_appId, appKey: mimc_appKey, appSecret: mimc_appSecret, appAccount: mimc_appAccount};
                 result = httpRequest('https://mimc.chat.xiaomi.net/api/account/token', sendData);
-                Cookies.set('user', result);
-                Cookies.set("mimc_appAccount", mimc_appAccount);
+                //Cookies.set('user', result);
+                //Cookies.set("mimc_appAccount", mimc_appAccount);
+                window.sessionStorage.setItem("user", JSON.stringify(result));
+                window.sessionStorage.setItem("mimc_appAccount", mimc_appAccount);
             }
         }
     }
@@ -232,17 +267,16 @@ function statusChange(bindResult, errType, errReason, errDesc) {
 
 function receiveP2PMsg(message) {
     console.log(JSON.stringify(message));
-    var date = new Date(parseInt(message.getTimeStamp()));
-    writeTimeToScreens(date, 1, message.getFromAccount(), mimc_appAccount);
-    var disMsg = new Base64();
+    let date = new Date(parseInt(message.getTimeStamp()));
+    let disMsg = new Base64();
     console.log("biztype=" + message.getBizType());
     for(let i = 0, len = friendData.length; i < len; i++) {
         if (message.getFromAccount() === friendData[i].name) {
+            writeTimeToScreens(date, 1,friendData[i], loginedUser);
             writeToScreens(disMsg.decode(JSON.parse(message.getPayload()).payload), 1, friendData[i], loginedUser);
             break;
         }
     }
-
 }
 
 function receiveP2TMsg(message) {
@@ -317,6 +351,8 @@ function logout() {
     user.logout();
     Cookies.remove("mimc_appAccount");
     Cookies.remove("user");
+    window.localStorage.removeItem("mimc_appAccount");
+    window.localStorage.removeItem("user");
 }
 
 function createGroup() {
@@ -383,25 +419,33 @@ function sendGroupMsg() {
 }
 
 /**
- * 把时间显示在页面上
- * @param date 时间，Date类型
+ * 功能：把时间显示在页面上
+ * 规则：微信聊天消息时间显示说明
+ * 1、当天的消息，以每5分钟为一个跨度的显示时间；
+ * 2、消息超过1天、小于1周，显示星期+收发消息的时间；
+ * 3、消息大于1周，显示手机收发时间的日期。
+ * @param datetime 时间，Date类型
  * @param msgSource 消息来源，0是自己，1是对方
- * @param fromUser 消息发送者
- * @param toUser 消息接收者
+ * @param fromUser 消息发送者，结构{name: "", profilePic: ""}
+ * @param toUser 消息接收者，结构{name: "", profilePic: ""}
  */
-function writeTimeToScreens(date, msgSource, fromUser, toUser) {
+function writeTimeToScreens(datetime, msgSource, fromUser, toUser) {
+    datetime = dayjs(datetime);
+
     let pre = document.createElement("p");
     pre.style.wordWrap = "break-word";
     pre.style.textAlign = "center";
-    pre.innerHTML = PrefixInteger(date.getHours(), 2) + ":" + PrefixInteger(date.getMinutes(), 2);
+    pre.innerHTML = datetime.format("HH:mm");
 
     let outputs;
     if (0 === msgSource) {
         // 消息来源是自己，说明是自己发送的消息
         outputs = document.getElementById("user-" + toUser.name);
+        console.log("user-" + toUser.name);
     } else {
         // 消息来源是对方，说明是自己接收的消息
         outputs = document.getElementById("user-" + fromUser.name);
+        console.log("user-" + fromUser.name);
     }
     if (outputs) {
 
@@ -409,31 +453,49 @@ function writeTimeToScreens(date, msgSource, fromUser, toUser) {
         console.error("not found outputs");
     }
 
-    // 判断和上一次发送或者接收的时间间隔，如果超过1分钟，才显示时间
+    let lastTime;
+    let lastTimePrefix = "lastTime-";
     if (0 === msgSource) {
         // 消息来源是自己，说明是自己发送的消息
-        let tempLastDateStr = Cookies.get("lastDate-" + toUser);
-        if (tempLastDateStr) {
-            let lastDate = new Date(parseInt(tempLastDateStr));
-            if (outputs) {
-                outputs.appendChild(pre);
-            }
-        } else {
-            // 直接显示时间
-            if (outputs) {
-                outputs.appendChild(pre);
-            }
-        }
-        Cookies.set("lastDate-" + toUser, String((date).valueOf()));
+        lastTime = window.sessionStorage.getItem(lastTimePrefix + toUser.name);
+        window.sessionStorage.setItem(lastTimePrefix + toUser.name, datetime.unix().toString());
     } else {
         // 消息来源是对方，说明是自己接收的消息
-        let tempLastDateStr = Cookies.get("lastDate-" + fromUser);
-        if (tempLastDateStr) {
-            let lastDate = new Date(parseInt(tempLastDateStr));
-        } else {
-            // 直接显示时间
+        lastTime = window.sessionStorage.getItem(lastTimePrefix + fromUser.name);
+        window.sessionStorage.setItem(lastTimePrefix + fromUser.name, datetime.unix().toString());
+    }
+
+    // 判断是否需要加日期前缀
+    let currentTime = dayjs(new Date());
+    if (currentTime.format("YYYYMMDD") === datetime.format("YYYYMMDD")) {
+        // 如果是今天
+        pre.innerHTML = datetime.format("HH:mm");
+    } else if (currentTime.subtract(1, "day").format("YYYYMMDD") === datetime.format("YYYYMMDD")) {
+        // 如果是昨天
+        pre.innerHTML = "昨天 " + datetime.format("HH:mm");
+    } else if (currentTime.subtract(7, "day").format("YYYYMMDD") < datetime.format("YYYYMMDD")) {
+        // 如果消息超过1天、小于1周
+        pre.innerHTML = chinaWeek(datetime.day()) + " " + datetime.format("HH:mm");
+    } else {
+        pre.innerHTML = datetime.format("YYYY年MM月DD日 HH:mm");
+    }
+
+    if (lastTime) {
+        if (typeof lastTime === "string") {
+            lastTime = parseInt(lastTime);
         }
-        Cookies.set("lastDate-" + fromUser, String((date).valueOf()));
+        lastTime = dayjs.unix(lastTime);
+        console.log("date=" + datetime.format("YYYY-MM-DD HH:mm:ss"));
+        console.log("lastTime=" + lastTime.format("YYYY-MM-DD HH:mm:ss"));
+        // 豪秒差
+        let milliseconds = datetime.diff(lastTime);
+        console.log("milliseconds = " + milliseconds);
+        if (milliseconds >= 300000) {
+            outputs.appendChild(pre);
+        }
+        //outputs.appendChild(pre);
+    } else {
+        outputs.appendChild(pre);
     }
 }
 
