@@ -122,7 +122,7 @@
                     <el-main style="padding: 0;" ref="homePage">
                         <el-menu background-color="#2e3238"
                                  text-color="#FFFFFF"
-                                 active-text-color="#FFFFFF">
+                                 active-text-color="#FFFFFF" style="border-right: solid 0px #2e3238;">
                             <template v-for="(item, index) of friendData">
                                 <el-menu-item :index="index" @click="chat(item.name)">
                                     <template slot="title">
@@ -138,7 +138,7 @@
                 <el-container ref="app">
                     <el-main ref="message" id="messageBox" style="background-color: #E9EEF3;">
                         <div id="message" class="message">
-                            <ul id="tab-group">
+                            <ul id="tab-group" style="padding-inline-start: 20px;">
 
                             </ul>
                         </div>
