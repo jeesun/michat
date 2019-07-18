@@ -180,7 +180,9 @@
 </div>
 <script>
     function delHtmlTag(str) {
-        return str.replace(/<(?!img|span|\/span).*?>/g, "");  //正则去掉所有的html标记，保留span和img标签。
+        str = str.replace(/<(?!img|span|\/span).*?>/g, "");  //正则去掉所有的html标记，保留span和img标签。
+        str = str.replace(/style\s*?=\s*?(['"])[\s\S]*?\1/, ""); //正则过滤掉行内样式style
+        return str;
     }
 
     // 去掉前后空格
