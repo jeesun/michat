@@ -177,6 +177,15 @@
     </el-container>
 </div>
 <script>
+    function delHtmlTag(str) {
+        return str.replace(/<(?!img|span|\/span).*?>/g, "");  //正则去掉所有的html标记，保留span和img标签。
+    }
+
+    // 去掉前后空格
+    function trim(str) {
+        return str.replace(/(^\s*)|(\s*$)/g, "");
+    }
+
     var toolbarOptions = {
         container: [
             ['emoji']
@@ -204,9 +213,6 @@
             },
             searchFriend: '',
             friendData: friendData,
-            message: 'Hi from Vue.',
-            content: '',
-            content2: '',
             editorOption: {
                 modules: {
                     "toolbar": toolbarOptions,
@@ -288,7 +294,9 @@
                 if (!this.toUser.name || "" === this.toUser.name) {
                     this.$message.error('请选择对方账号');
                 } else {
-                    if ("" === this.textarea) {
+                    // 内容去标签和去两边空格（保留span标签，用于emoji表情。）
+                    let msgContent = trim(delHtmlTag(this.textarea));
+                    if ("" === msgContent) {
                         this.visible = true;
                         setTimeout(function () {
                             app.visible = false;
@@ -299,7 +307,7 @@
                             this.$message.error("不能给自己发送消息");
                         } else {
                             this.visible = false;
-                            sendMsg(this.toUser, this.textarea);
+                            sendMsg(this.toUser, msgContent);
                             this.textarea = "";
                         }
                     }
@@ -345,9 +353,6 @@
             },
         },
         computed: {
-            editorA() {
-                return this.$refs.quillEditorA.quill
-            },
             editorB() {
                 return this.$refs.quillEditorB.quill
             }

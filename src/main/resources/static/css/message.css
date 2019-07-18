@@ -33,6 +33,7 @@
     padding: 0 10px;
     max-width: calc(100% - 40px);
     min-height: 30px;
+    line-height: 2.5;
     font-size: 12px;
     text-align: left;
     word-break: break-all;
