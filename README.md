@@ -21,6 +21,11 @@
 ## 截图展示
 ![聊天截图](screenshots/chat.png)
 
+## 特性
+1. 登录时自动获取离线消息；
+2. 支持emoji表情；
+3. 其他MIMC特性。
+
 ## 如何使用
 1. 请先双击目录“需要安装的jars”的install.bat，安装自定义的jars。
 2. 直接运行类MichatApplication，启动项目。访问[http://localhost:8081/login](http://localhost:8081/login)，登录账号。
