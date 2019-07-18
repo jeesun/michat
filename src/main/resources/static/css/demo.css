@@ -27,3 +27,10 @@ ul {
 .el-menu-item.is-active {
     background-color: #43474C !important;
 }
+
+/**
+必须要有，保证对话框和头像在一行。
+ */
+* {
+    box-sizing: border-box;
+}
