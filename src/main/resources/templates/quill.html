@@ -1,0 +1,47 @@
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link href="https://cdn.quilljs.com/1.3.5/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.5/quill.js"></script>
+    <link th:href="@{static/plugins/quill-emoji/1.0/quill-emoji.css}" rel="stylesheet">
+    <script th:src="@{static/plugins/quill-emoji/1.0/quill-emoji.js}"></script>
+    <style>
+        /* #emoji-palette {
+          top: -310px !important;
+        } */
+        html,body{
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container" style="position:relative;">
+    <!-- <h2>Editor</h2> -->
+    <div style="height: 360px;"></div>
+    <div id="quill-editor" style="max-height: 200px;"></div>
+</div>
+
+<script type="text/javascript">
+    var toolbarOptions = {
+        container: [
+            ['emoji']
+        ],
+        handlers: {
+            'emoji': function () {}
+        }
+    }
+
+    var quill = new Quill('#quill-editor', {
+        modules: {
+            "toolbar": toolbarOptions,
+            "emoji-toolbar": true,
+            "emoji-shortname": true
+        },
+        placeholder: 'Compose an epic...',
+        theme: 'snow',
+    });
+</script>
+</body>
+
+</html>

@@ -18,6 +18,7 @@ public class MvcConfig extends WebMvcConfigurationSupport {
         registry.addViewController("/hello").setViewName("hello");
         registry.addViewController("/login").setViewName("login");
         registry.addViewController("/chatIndex").setViewName("chatIndex");
+        registry.addViewController("/quill").setViewName("quill");
     }
 
     @Override

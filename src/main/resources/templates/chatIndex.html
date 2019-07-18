@@ -20,6 +20,19 @@
     <script th:src="@{/webjars/element-ui/2.10.1/lib/umd/locale/en.js}"></script>
     <script th:src="@{static/js/js.cookie.min.js}"></script>
     <script th:src="@{/webjars/dayjs/1.8.9/dayjs.min.js}"></script>
+
+    <!-- Include the Quill library -->
+    <script src="https://cdn.quilljs.com/1.3.4/quill.js"></script>
+    <!-- Quill JS Vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue-quill-editor@3.0.4/dist/vue-quill-editor.js"></script>
+    <!-- Include stylesheet -->
+    <link href="https://cdn.quilljs.com/1.3.4/quill.core.css" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.4/quill.snow.css" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.4/quill.bubble.css" rel="stylesheet">
+
+    <link th:href="@{static/plugins/quill-emoji/1.0/quill-emoji.css}" rel="stylesheet">
+    <script th:src="@{static/plugins/quill-emoji/1.0/quill-emoji.js}"></script>
+
     <link th:href="@{static/css/demo.css}" rel="stylesheet">
     <link th:href="@{static/css/message.css}" rel="stylesheet">
     <script>
@@ -77,25 +90,6 @@
         ];
     </script>
     <script th:src="@{static/js/chatIndex.js}"></script>
-    <style>
-        #sendButton {
-            position:absolute;
-            right: 20px;
-            bottom: 16px;
-        }
-
-        .mod {
-            display: none;
-        }
-
-        .active {
-            display: block;
-        }
-
-        .el-menu-item.is-active {
-            background-color: #43474C !important;
-        }
-    </style>
 </head>
 
 <div id="app">
@@ -147,8 +141,8 @@
                             </ul>
                         </div>
                     </el-main>
-                    <el-footer style="line-height: 0;">
-                        <div id="input" style="height: 120px;">
+                    <el-footer style="line-height: 0;padding:0;">
+                        <div id="input" style="height: 160px;">
                             <!--<label>消息：</label>-->
                             <!--<input id="sendmessage" type="text" />-->
                             <!--<el-input
@@ -157,7 +151,11 @@
                                     placeholder="按Enter发送内容"
                                     v-model="textarea" @keyup.enter.native="sendMsg()" style="width: 100%;height: 100%">
                             </el-input>-->
-                            <textarea id="textarea" v-model="textarea" rows="5" placeholder="按Enter发送内容" style="width: 100%;height: 100%; border: 0;"></textarea>
+                            <!--<textarea id="textarea" v-model="textarea" rows="5" placeholder="按Enter发送内容" style="width: 100%;height: 100%; border: 0;"></textarea>-->
+                            <local-quill-editor v-model="textarea" ref="quillEditorB" :options="editorOption"
+                                                @blur="onEditorBlur($event)" @focus="onEditorFocus($event)"
+                                                @ready="onEditorReady($event)" style="height: 120px;">
+                            </local-quill-editor>
                             <div id="sendButton">
                                 <!--<button id="button1" onclick="sendMsg()">发送</button>-->
                                 <el-popover
@@ -179,6 +177,15 @@
     </el-container>
 </div>
 <script>
+    var toolbarOptions = {
+        container: [
+            ['emoji']
+        ],
+        handlers: {
+            'emoji': function () {}
+        }
+    };
+
     var app = new Vue({
         el: '#app',
         data: {
@@ -196,7 +203,21 @@
                 profilePic: ''
             },
             searchFriend: '',
-            friendData: friendData
+            friendData: friendData,
+            message: 'Hi from Vue.',
+            content: '',
+            content2: '',
+            editorOption: {
+                modules: {
+                    "toolbar": toolbarOptions,
+                    "emoji-toolbar": true,
+                    "emoji-shortname": true
+                },
+                theme: 'snow'
+            }
+        },
+        components: {
+            LocalQuillEditor: VueQuillEditor.quillEditor
         },
         mounted: function () {
             var mimc_appAccount = Cookies.get("mimc_appAccount");
@@ -223,7 +244,7 @@
                 let tab = document.createElement("li");
                 tab.id = "user-" + this.friendData[i].name;
                 if (0 === i) {
-                    tab.className = "mod active";
+                    tab.className = "mod mod-active";
                 } else {
                     tab.className = "mod";
                 }
@@ -243,6 +264,8 @@
             window.onresize = function temp() {
                 this.clientHeight = `${document.documentElement.clientHeight}`;
             };
+
+            console.log('this is quill A instance object', this.editorA, 'B instance', this.editorB)
         },
         watch: {
             // 如果 `clientHeight` 发生改变，这个函数就会运行
@@ -251,6 +274,15 @@
             }
         },
         methods: {
+            onEditorBlur(quill) {
+                console.log('editor blur!', quill)
+            },
+            onEditorFocus(quill) {
+                console.log('editor focus!', quill)
+            },
+            onEditorReady(quill) {
+                console.log('editor ready!', quill)
+            },
             sendMsg: function () {
                 //var toUser = Cookies.get("toUser");
                 if (!this.toUser.name || "" === this.toUser.name) {
@@ -300,7 +332,7 @@
                 for (let i = 0, len = tabs.length; i < len; i++) {
                     tabs[i].className = "mod";
                     if (index === i) {
-                        tabs[i].className = "mod active";
+                        tabs[i].className = "mod mod-active";
                     }
                 }
             },
@@ -308,13 +340,21 @@
                 // console.log(clientHeight);
                 // console.log(this.$refs.homePage.$el.style.height);
                 this.$refs.homePage.$el.style.height = clientHeight-100+'px';
-                this.$refs.message.$el.style.height = clientHeight-125+'px';
+                this.$refs.message.$el.style.height = clientHeight-165+'px';
                 this.$refs.app.$el.style.height = clientHeight+'px';
             },
-        }
+        },
+        computed: {
+            editorA() {
+                return this.$refs.quillEditorA.quill
+            },
+            editorB() {
+                return this.$refs.quillEditorB.quill
+            }
+        },
     });
 
-    document.getElementById("textarea").onkeydown=function(e){
+    /*document.getElementById("textarea").onkeydown=function(e){
         if(e.keyCode == 13 && e.ctrlKey){
             document.getElementById("a").value += "\n";
         }else if(e.keyCode == 13){
@@ -323,7 +363,7 @@
             // 下面写你的发送消息的代码
             app.sendMsg();
         }
-    }
+    }*/
 </script>
 
 
