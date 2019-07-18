@@ -18,23 +18,25 @@
     <script th:src="@{/webjars/element-ui/2.10.1/lib/index.js}"></script>
     <script th:src="@{/webjars/element-ui/2.10.1/lib/umd/locale/zh-CN.js}"></script>
     <script th:src="@{/webjars/element-ui/2.10.1/lib/umd/locale/en.js}"></script>
-    <script th:src="@{static/js/js.cookie.min.js}"></script>
+    <script th:src="@{/static/js/js.cookie.min.js}"></script>
     <script th:src="@{/webjars/dayjs/1.8.9/dayjs.min.js}"></script>
 
-    <!-- Include the Quill library -->
-    <script src="https://cdn.quilljs.com/1.3.4/quill.js"></script>
-    <!-- Quill JS Vue -->
+    <!--<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-quill-editor@3.0.4/dist/vue-quill-editor.js"></script>
-    <!-- Include stylesheet -->
-    <link href="https://cdn.quilljs.com/1.3.4/quill.core.css" rel="stylesheet">
-    <link href="https://cdn.quilljs.com/1.3.4/quill.snow.css" rel="stylesheet">
-    <link href="https://cdn.quilljs.com/1.3.4/quill.bubble.css" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.core.css" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">-->
+    <script th:src="@{/static/plugins/quill/1.3.6/quill.min.js}"></script>
+    <script th:src="@{/static/plugins/vue-quill-editor/3.0.6/vue-quill-editor.js}"></script>
+    <link rel="stylesheet" th:href="@{/static/plugins/quill/1.3.6/quill.core.css}">
+    <link rel="stylesheet" th:href="@{/static/plugins/quill/1.3.6/quill.snow.css}">
+    <link rel="stylesheet" th:href="@{/static/plugins/quill/1.3.6/quill.bubble.css}">
 
-    <link th:href="@{static/plugins/quill-emoji/1.0/quill-emoji.css}" rel="stylesheet">
-    <script th:src="@{static/plugins/quill-emoji/1.0/quill-emoji.js}"></script>
+    <link th:href="@{/static/plugins/quill-emoji/1.0/quill-emoji.css}" rel="stylesheet">
+    <script th:src="@{/static/plugins/quill-emoji/1.0/quill-emoji.js}"></script>
 
-    <link th:href="@{static/css/demo.css}" rel="stylesheet">
-    <link th:href="@{static/css/message.css}" rel="stylesheet">
+    <link th:href="@{/static/css/demo.css}" rel="stylesheet">
+    <link th:href="@{/static/css/message.css}" rel="stylesheet">
     <script>
         // 给chatIndex.js调用的。
         loginedUser = {
