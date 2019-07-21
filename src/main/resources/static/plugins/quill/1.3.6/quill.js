@@ -5130,8 +5130,8 @@ var Cursor = function (_Parchment$Embed) {
 Cursor.blotName = 'cursor';
 Cursor.className = 'ql-cursor';
 Cursor.tagName = 'span';
-Cursor.CONTENTS = '\uFEFF'; // Zero width no break space
-
+//Cursor.CONTENTS = '\uFEFF'; // Zero width no break space
+Cursor.CONTENTS = ''; // Zero width no break space
 
 exports.default = Cursor;
 
@@ -6102,7 +6102,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var GUARD_TEXT = '\uFEFF';
+//var GUARD_TEXT = '\uFEFF';
+var GUARD_TEXT = '';
 
 var Embed = function (_Parchment$Embed) {
   _inherits(Embed, _Parchment$Embed);
